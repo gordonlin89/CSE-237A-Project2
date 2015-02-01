@@ -10,10 +10,27 @@
  */
 
 #define CPU_GET "/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"
+#define CPU_PUT "/sys/devices/system/cpu/cpu0/cpufreq/scaling_setspeed"
 #define CPU_UTIL "/proc/stat"
 
 #define GPU_FREQ "/sys/class/kgsl/kgsl-3d0/gpuclk"
 #define GPU_UTIL "/sys/class/kgsl/kgsl-3d0/gpubusy"
+
+/*
+ * cpu frequencies
+ */
+
+unsigned int cpu_freqs[] = {
+	192000, 384000, 432000, 486000,  540000,
+	594000, 648000, 702000, 756000,  810000,
+	864000, 918000, 972000, 1026000, 1080000,
+	1134000, 1188000
+};
+
+#define CPU_NFREQS (sizeof(cpu_freqs) / sizeof(unsigned int))
+#define CPU_HI (CPU_NFREQS - 1)
+#define CPU_MIN cpu_freqs[0]
+#define CPU_MAX cpu_freqs[CPU_NFREQS - 1]
 
 
 /**
@@ -68,6 +85,20 @@ unsigned int cpu_get()
 	sscanf(buf, "%u", &freq);
 
 	return freq;
+}
+
+/**
+ * Set the CPU frequency.
+ *   @freq: The frequency.
+ */
+
+void cpu_set(unsigned int freq)
+{
+	FILE *file;
+
+	file = fopen(CPU_PUT, "w");
+	fprintf(file, "%u", freq);
+	fclose(file);
 }
 
 /**

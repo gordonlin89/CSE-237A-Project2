@@ -1,16 +1,36 @@
 #include "common.h"
 
+unsigned int tm = 250;
 
 int main()
 {
+	bool max = false;
+	bool debug = true;
+
+	cpu_set(CPU_MIN);
 	cpu_util();
 
 	while(true) {
-		printf("freq: %u\n", cpu_get());
-		printf("util: %f\n", cpu_util());
-		printf("gpu-freq: %u\n", gpu_get());
-		printf("gpu-util: %f\n", gpu_util());
-		usleep(900000);
+		usleep(1000*tm);
+
+		if(max) {
+			if(cpu_util() < 0.5) {
+				cpu_set(CPU_MIN);
+				max = false;
+
+				if(debug)
+					printf("cpu set to MIN\n");
+			}
+		}
+		else {
+			if(cpu_util() > 0.5) {
+				cpu_set(CPU_MAX);
+				max = true;
+
+				if(debug)
+					printf("cpu set to MAX\n");
+			}
+		}
 	}
 
 	return 0;

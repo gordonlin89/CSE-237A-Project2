@@ -59,7 +59,7 @@ unsigned int pwr_active(unsigned int freq)
 int main()
 {
 	struct pollfd fds;
-	float pwr = 0.0;
+	float energy = 0.0;
 	float step = (float)tm / 1000.0f;
 	unsigned int n = 0;
 
@@ -77,7 +77,7 @@ int main()
 
 		n++;
 		freq = cpu_get();
-		pwr += pwr_idle(freq) * step + pwr_active(freq) * cpu_util() * step;
+		energy += pwr_idle(freq) * step + pwr_active(freq) * cpu_util() * step;
 
 		//printf("freq: %u\n", cpu_get());
 		//printf("util: %f\n", cpu_util());
@@ -85,9 +85,10 @@ int main()
 		//printf("gpu-util: %f\n", gpu_util());
 	}
 
-	printf("total: %f\n", pwr);
-	printf("ave: %f\n", pwr / n / step);
+	printf("total: %f\n", energy);
+	printf("ave: %f\n", energy / n / step);
 	printf("time: %f\n", n * step);
+	printf("delay-product: %f\n", energy * n * step);
 
 	return 0;
 }
