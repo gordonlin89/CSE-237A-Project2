@@ -7,6 +7,9 @@
 #define CPU_GET "/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"
 #define CPU_UTIL "/proc/stat"
 
+#define GPU_FREQ "/sys/class/kgsl/kgsl-3d0/gpuclk"
+#define GPU_UTIL "/sys/class/kgsl/kgsl-3d0/gpubusy"
+
 
 /**
  * Print an error message to the stderr and terminate.
@@ -63,7 +66,7 @@ unsigned int cpu_get()
 }
 
 /**
- * Retrieve the cpu utilization.
+ * Retrieve the CPU utilization.
  *   &returns: The utilization between '0.0' and '1.0'.
  */
 
@@ -99,6 +102,38 @@ float cpu_util()
 	return util;
 }
 
+/**
+ * Retrieve the GPU frequency.
+ *   &returns: The frequncy.
+ */
+
+unsigned int gpu_get()
+{
+	char buf[256];
+	unsigned int freq;
+
+	readfile(GPU_FREQ, buf, sizeof(buf));
+	sscanf(buf, "%u", &freq);
+
+	return freq;
+}
+
+/**
+ * Retrieve the GPU utilization.
+ *   &returns: The utilization between '0.0' and '1.0'.
+ */
+
+float gpu_util()
+{
+	char buf[512];
+	unsigned int a, b;
+
+	readfile(GPU_UTIL, buf, sizeof(buf));
+	sscanf(buf, "%u%u", &a, &b);
+
+	return b ? (float)a / (float)b : 0.0f;
+}
+
 int main()
 {
 	cpu_util();
@@ -106,6 +141,8 @@ int main()
 	while(true) {
 		printf("freq: %u\n", cpu_get());
 		printf("util: %f\n", cpu_util());
+		printf("gpu-freq: %u\n", gpu_get());
+		printf("gpu-util: %f\n", gpu_util());
 		usleep(900000);
 	}
 
