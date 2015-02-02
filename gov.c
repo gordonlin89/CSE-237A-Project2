@@ -1,18 +1,6 @@
 #include "common.h"
 #include <poll.h>
 
-
-unsigned int opt_uint(const char *arg)
-{
-	long val;
-
-	val = strtol(arg, (char **)&arg, 0);
-	if((*arg != '\0') || (val < 0) || (val >= UINT_MAX))
-		fprintf(stderr, "Invalid number."), exit(1);
-
-	return val;
-}
-
 int main(int argc, char **argv)
 {
 	bool max = false;

@@ -233,3 +233,18 @@ const char *dbgtime()
 
 	return buf;
 }
+
+
+unsigned int opt_uint(const char *arg)
+{
+	long val;
+
+	if(arg == NULL)
+		fprintf(stderr, "Missing parameter."), exit(1);
+
+	val = strtol(arg, (char **)&arg, 0);
+	if((*arg != '\0') || (val < 0) || (val >= UINT_MAX))
+		fprintf(stderr, "Invalid number."), exit(1);
+
+	return val;
+}
