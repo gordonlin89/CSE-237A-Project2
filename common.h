@@ -18,6 +18,7 @@
 
 #define GPU_FREQ "/sys/class/kgsl/kgsl-3d0/gpuclk"
 #define GPU_PUT "/sys/class/kgsl/kgsl-3d0/gpuclk"
+#define GPU_PUT2 "/sys/class/kgsl/kgsl-3d0/max_gpuclk"
 #define GPU_UTIL "/sys/class/kgsl/kgsl-3d0/gpubusy"
 
 /*
@@ -221,6 +222,10 @@ void gpu_set(unsigned int freq)
 	FILE *fp;
 
 	fp = fopen(GPU_PUT, "w");
+	fprintf(fp, "%u", freq);
+	fclose(fp);
+
+	fp = fopen(GPU_PUT2, "w");
 	fprintf(fp, "%u", freq);
 	fclose(fp);
 }
