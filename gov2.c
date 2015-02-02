@@ -17,6 +17,7 @@ int main()
 	int sel = 0;
 	bool debug = true;
 
+	cpu_init();
 	cpu_set(CPU_MIN);
 	cpu_util();
 

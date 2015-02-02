@@ -36,6 +36,7 @@ int main(int argc, char **argv)
 			fprintf(stderr, "Invalid argument '%s'.\n", *argv), exit(1);
 	}
 
+	cpu_init();
 	cpu_set(f_min);
 	cpu_util();
 

@@ -93,6 +93,19 @@ void readfile(const char *path, char *buf, size_t size)
 }
 
 
+void cpu_init()
+{
+	FILE *fp;
+
+	fp = fopen("/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor", "w");
+	fprintf(fp, "userspace");
+	fclose(fp);
+
+	fp = fopen("/sys/devices/system/cpu/cpu1/online", "w");
+	fprintf(fp, "0");
+	fclose(fp);
+}
+
 /**
  * Retrieve the CPU frequency.
  *   &returns: The frequncy.
