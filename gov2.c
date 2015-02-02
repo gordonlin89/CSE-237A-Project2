@@ -17,6 +17,7 @@ int main(int argc, char **argv)
 	float smooth = 0.8f;
 	unsigned int inc = 3, dec = 1;
 	float thres_low = 0.3, thres_high = 0.9;
+	bool c_enable = true, g_enable = true;
 
 	while(argv[i] != NULL) {
 		if(strcmp(argv[i], "-inc") == 0) {
@@ -39,6 +40,10 @@ int main(int argc, char **argv)
 			smooth = opt_float(argv[i+1]);
 			i += 2;
 		}
+		else if(strcmp(argv[i], "-nocpu") == 0)
+			c_enable = false, i++;
+		else if(strcmp(argv[i], "-nogpu") == 0)
+			g_enable = false, i++;
 		else if(strcmp(argv[i], "-debug") == 0)
 			debug++, i++;
 		else
@@ -68,7 +73,7 @@ int main(int argc, char **argv)
 		if(debug >= 2)
 			printf("%s: cpu %.03f, gpu %.03f\n", dbgtime(), c_util, g_util);
 
-		if(c_util > thres_high) {
+		if(c_enable && (c_util > thres_high)) {
 			c_sel += inc;
 			if(c_sel > CPU_HI)
 				c_sel = CPU_HI;
@@ -77,7 +82,7 @@ int main(int argc, char **argv)
 			if(debug >= 1)
 				printf("%s: cpu set to %d\n", dbgtime(), cpu_freqs[c_sel]);
 		}
-		else if(c_util < thres_low) {
+		else if(c_enable && (c_util < thres_low)) {
 			c_sel -= dec;
 			if(c_sel < 0)
 				c_sel = 0;
@@ -87,7 +92,7 @@ int main(int argc, char **argv)
 				printf("%s: cpu set to %d\n", dbgtime(), cpu_freqs[c_sel]);
 		}
 
-		if(g_util > thres_high) {
+		if(g_enable && (g_util > thres_high)) {
 			g_sel += 1;
 			if(g_sel > GPU_HI)
 				g_sel = GPU_HI;
@@ -96,7 +101,7 @@ int main(int argc, char **argv)
 			if(debug >= 1)
 				printf("%s: gpu set to %d\n", dbgtime(), gpu_freqs[g_sel]);
 		}
-		else if(g_util < thres_low) {
+		else if(g_enable && (g_util < thres_low)) {
 			g_sel -= 1;
 			if(g_sel < 0)
 				g_sel = 0;
