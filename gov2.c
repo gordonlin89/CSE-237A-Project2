@@ -17,6 +17,7 @@ int main(int argc, char **argv)
 	float smooth = 0.8f;
 	unsigned int inc = 3, dec = 1;
 	float thres_low = 0.3, thres_high = 0.9;
+	float gpu_low = 0.2, gpu_high = 0.6;
 	bool c_enable = true, g_enable = true;
 
 	while(argv[i] != NULL) {
@@ -30,6 +31,14 @@ int main(int argc, char **argv)
 		}
 		else if(strcmp(argv[i], "-low") == 0) {
 			thres_low = opt_float(argv[i+1]);
+			i += 2;
+		}
+		else if(strcmp(argv[i], "-gpuhigh") == 0) {
+			gpu_high = opt_float(argv[i+1]);
+			i += 2;
+		}
+		else if(strcmp(argv[i], "-gpulow") == 0) {
+			gpu_low = opt_float(argv[i+1]);
 			i += 2;
 		}
 		else if(strcmp(argv[i], "-high") == 0) {
@@ -93,7 +102,7 @@ int main(int argc, char **argv)
 				printf("%s: cpu set to %d\n", dbgtime(), cpu_freqs[c_sel]);
 		}
 
-		if(g_enable && (g_util > thres_high) && (c_sel < GPU_HI)) {
+		if(g_enable && (g_util > gpu_high) && (g_sel < GPU_HI)) {
 			g_sel += 1;
 			if(g_sel > GPU_HI)
 				g_sel = GPU_HI;
@@ -102,7 +111,7 @@ int main(int argc, char **argv)
 			if(debug >= 1)
 				printf("%s: gpu set to %d\n", dbgtime(), gpu_freqs[g_sel]);
 		}
-		else if(g_enable && (g_util < thres_low) && (g_sel > 0)) {
+		else if(g_enable && (g_util < gpu_low) && (g_sel > 0)) {
 			g_sel -= 1;
 			if(g_sel < 0)
 				g_sel = 0;
