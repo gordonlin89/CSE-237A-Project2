@@ -66,7 +66,7 @@ int main()
 	cpu_util();
 
 	while(true) {
-		unsigned int freq, idle, active;
+		unsigned int freq;
 
 		fds.fd = STDIN_FILENO;
 		fds.events = POLLIN;
@@ -78,11 +78,6 @@ int main()
 		n++;
 		freq = cpu_get();
 		energy += pwr_idle(freq) * step + pwr_active(freq) * cpu_util() * step;
-
-		//printf("freq: %u\n", cpu_get());
-		//printf("util: %f\n", cpu_util());
-		//printf("gpu-freq: %u\n", gpu_get());
-		//printf("gpu-util: %f\n", gpu_util());
 	}
 
 	printf("total: %f\n", energy);

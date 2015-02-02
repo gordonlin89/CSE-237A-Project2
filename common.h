@@ -1,8 +1,11 @@
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdbool.h>
+#include <string.h>
+#include <time.h>
 
 
 /*
@@ -31,6 +34,25 @@ unsigned int cpu_freqs[] = {
 #define CPU_HI (CPU_NFREQS - 1)
 #define CPU_MIN cpu_freqs[0]
 #define CPU_MAX cpu_freqs[CPU_NFREQS - 1]
+
+
+/**
+ * Check a CPU frequency to make sure it's valid.
+ *   @f: The frequency.
+ *   &returns: True if valid, false otherwise.
+ */
+
+bool cpu_chk(unsigned int f)
+{
+	unsigned int i;
+
+	for(i = 0; i < CPU_NFREQS; i++) {
+		if(cpu_freqs[i] == f)
+			return true;
+	}
+
+	return false;
+}
 
 
 /**
@@ -108,8 +130,6 @@ void cpu_set(unsigned int freq)
 
 float cpu_util()
 {
-	int fd;
-	ssize_t rd;
 	float util;
 	char *ptr, buf[512], str[32];
 	unsigned int n, user, nice, sys, idle, iowait, irq, sirq;
@@ -168,4 +188,48 @@ float gpu_util()
 	sscanf(buf, "%u%u", &a, &b);
 
 	return b ? (float)a / (float)b : 0.0f;
+}
+
+
+/**
+ * Retrieve the system time in milliseconds.
+ *   &returns: Time in milliseconds.
+ */
+
+unsigned long mstime()
+{
+	struct timespec spec;
+
+	clock_gettime(CLOCK_REALTIME, &spec);
+
+	return spec.tv_sec * 1000l + spec.tv_nsec / 1000000l;
+}
+
+
+unsigned long _dbgtime_start;
+
+/**
+ * Initialize the start time of the process.
+ */
+
+__attribute__((constructor))
+void _dbgtime_init()
+{
+	_dbgtime_start = mstime();
+}
+
+/**
+ * Retrieve the current time in the format '####.##'. Be aware, the returned
+ * buffer is statically allocated.
+ *   &returns: The formatted time.
+ */
+
+const char *dbgtime()
+{
+	static char buf[64];
+	unsigned long tm = mstime() - _dbgtime_start;
+
+	snprintf(buf, sizeof(buf), "%.04lu.%.02lu", tm / 1000, (tm % 1000) / 10);
+
+	return buf;
 }
