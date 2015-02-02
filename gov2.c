@@ -1,47 +1,109 @@
 #include "common.h"
+#include <poll.h>
 
-float thres_low = 0.3, thres_high = 0.9;
-unsigned int inc = 3;
-unsigned int dec = 1;
-unsigned int tm[] = {
+unsigned int period[] = {
 	250, 235, 220, 205, 190,
 	180, 170, 160, 150, 145,
 	140, 135, 130, 125, 120,
 	110, 100
 };
-float smooth = 0.8f;
 
-int main()
+int main(int argc, char **argv)
 {
-	float util = 0.0;;
-	int sel = 0;
-	bool debug = true;
+	float c_util = 0.0f, g_util = 0.0f;
+	int c_sel = 0, g_sel = 0;
+	int debug = 0;
+	unsigned int i = 1;
+	float smooth = 0.8f;
+	unsigned int inc = 3, dec = 1;
+	float thres_low = 0.3, thres_high = 0.9;
+
+	while(argv[i] != NULL) {
+		if(strcmp(argv[i], "-inc") == 0) {
+			inc = opt_uint(argv[i+1]);
+			i += 2;
+		}
+		else if(strcmp(argv[i], "-dec") == 0) {
+			dec = opt_uint(argv[i+1]);
+			i += 2;
+		}
+		else if(strcmp(argv[i], "-low") == 0) {
+			thres_low = opt_float(argv[i+1]);
+			i += 2;
+		}
+		else if(strcmp(argv[i], "-high") == 0) {
+			thres_high = opt_float(argv[i+1]);
+			i += 2;
+		}
+		else if(strcmp(argv[i], "-smooth") == 0) {
+			smooth = opt_float(argv[i+1]);
+			i += 2;
+		}
+		else if(strcmp(argv[i], "-debug") == 0)
+			debug++, i++;
+		else
+			fprintf(stderr, "Invalid argument '%s'.\n", argv[i]), exit(1);
+	}
 
 	cpu_init();
 	cpu_set(CPU_MIN);
 	cpu_util();
 
+	gpu_set(GPU_MIN);
+	gpu_util();
+
 	while(true) {
-		usleep(1000*tm[sel]);
+		struct pollfd fds;
 
-		util = (1.0 - smooth) * cpu_util() + smooth * util;
-		if(util > thres_high) {
-			sel += inc;
-			if(sel > CPU_HI)
-				sel = CPU_HI;
+		fds.fd = STDIN_FILENO;
+		fds.events = POLLIN;
+		fds.revents = 0;
 
-			cpu_set(cpu_freqs[sel]);
-			if(debug)
-				printf("inc; set to %f MHz\n", cpu_freqs[sel] / 1.000f);
+		if(poll(&fds, 1, period[c_sel]) > 0)
+			break;
+
+		c_util = (1.0 - smooth) * cpu_util() + smooth * c_util;
+		g_util = (1.0 - smooth) * gpu_util() + smooth * g_util;
+
+		if(debug >= 2)
+			printf("%s: cpu %.03f, gpu %.03f\n", dbgtime(), c_util, g_util);
+
+		if(c_util > thres_high) {
+			c_sel += inc;
+			if(c_sel > CPU_HI)
+				c_sel = CPU_HI;
+
+			cpu_set(cpu_freqs[c_sel]);
+			if(debug >= 1)
+				printf("%s: cpu set to %d\n", dbgtime(), cpu_freqs[c_sel]);
 		}
-		else if(util < thres_low) {
-			sel -= dec;
-			if(sel < 0)
-				sel = 0;
+		else if(c_util < thres_low) {
+			c_sel -= dec;
+			if(c_sel < 0)
+				c_sel = 0;
 
-			cpu_set(cpu_freqs[sel]);
-			if(debug)
-				printf("dec; set to %f MHz\n", cpu_freqs[sel] / 1.000f);
+			cpu_set(cpu_freqs[c_sel]);
+			if(debug >= 1)
+				printf("%s: cpu set to %d\n", dbgtime(), cpu_freqs[c_sel]);
+		}
+
+		if(g_util > thres_high) {
+			g_sel += 1;
+			if(g_sel > GPU_HI)
+				g_sel = GPU_HI;
+
+			gpu_set(gpu_freqs[g_sel]);
+			if(debug >= 1)
+				printf("%s: gpu set to %d\n", dbgtime(), gpu_freqs[g_sel]);
+		}
+		else if(g_util < thres_low) {
+			g_sel -= 1;
+			if(g_sel < 0)
+				g_sel = 0;
+
+			gpu_set(gpu_freqs[g_sel]);
+			if(debug >= 1)
+				printf("%s: gpu set to %d\n", dbgtime(), gpu_freqs[g_sel]);
 		}
 	}
 

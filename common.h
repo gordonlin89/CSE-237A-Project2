@@ -35,6 +35,19 @@ unsigned int cpu_freqs[] = {
 #define CPU_MIN cpu_freqs[0]
 #define CPU_MAX cpu_freqs[CPU_NFREQS - 1]
 
+/*
+ * gpu frequencies
+ */
+
+unsigned int gpu_freqs[] = {
+	177778, 200000, 228571, 266667
+};
+
+#define GPU_NFREQS (sizeof(gpu_freqs) / sizeof(unsigned int))
+#define GPU_HI (GPU_NFREQS - 1)
+#define GPU_MIN gpu_freqs[0]
+#define GPU_MAX gpu_freqs[GPU_NFREQS - 1]
+
 
 /**
  * Check a CPU frequency to make sure it's valid.
@@ -188,6 +201,20 @@ unsigned int gpu_get()
 }
 
 /**
+ * Set the GPU frequency.
+ *   @freq: The frequency.
+ */
+
+void gpu_set(unsigned int freq)
+{
+	FILE *fp;
+
+	fp = fopen(GPU_FREQ, "w");
+	fprintf(fp, "%u", freq);
+	fclose(fp);
+}
+
+/**
  * Retrieve the GPU utilization.
  *   &returns: The utilization between '0.0' and '1.0'.
  */
@@ -257,6 +284,20 @@ unsigned int opt_uint(const char *arg)
 
 	val = strtol(arg, (char **)&arg, 0);
 	if((*arg != '\0') || (val < 0) || (val >= UINT_MAX))
+		fprintf(stderr, "Invalid number."), exit(1);
+
+	return val;
+}
+
+float opt_float(const char *arg)
+{
+	float val;
+
+	if(arg == NULL)
+		fprintf(stderr, "Missing parameter."), exit(1);
+
+	val = strtof(arg, (char **)&arg);
+	if((*arg != '\0') || (val < 0))
 		fprintf(stderr, "Invalid number."), exit(1);
 
 	return val;
