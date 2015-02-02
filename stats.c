@@ -89,7 +89,7 @@ int main(int argc, char **argv)
 	unsigned int i = 1, n = 0, period = 500;
 	int pid = -1;
 	float step;
-	bool debug = false;
+	bool debug = false, gpu = true;
 
 	while(argv[i] != NULL) {
 		if(strcmp(argv[i], "-exec") == 0) {
@@ -110,6 +110,8 @@ int main(int argc, char **argv)
 		}
 		else if(strcmp(argv[i], "-debug") == 0)
 			debug = true, i++;
+		else if(strcmp(argv[i], "-nogpu") == 0)
+			gpu = false, i++;
 		else
 			fprintf(stderr, "Invalid argument '%s'.\n", argv[i]), exit(1);
 	}
@@ -139,7 +141,9 @@ int main(int argc, char **argv)
 		g_freq = cpu_get();
 
 		cur = pwr_idle(freq) * step + pwr_active(freq) * cpu_util() * step;
-		cur += gpu_idle(g_freq) * step + gpu_active(g_freq) * gpu_util() * step;
+
+		if(gpu)
+			cur += gpu_idle(g_freq) * step + gpu_active(g_freq) * gpu_util() * step;
 
 		energy += cur;
 
