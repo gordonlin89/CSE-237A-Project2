@@ -1,6 +1,6 @@
 #include "common.h"
+#include <poll.h>
 
-unsigned int tm = 250;
 
 unsigned int opt_uint(const char *arg)
 {
@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 {
 	bool max = false;
 	bool debug = false;
-	unsigned int i = 1, f_min = CPU_MIN, f_max = CPU_MAX;
+	unsigned int i = 1, f_min = CPU_MIN, f_max = CPU_MAX, period = 250;
 
 	while(argv[i] != NULL) {
 		if(argv[i][0] == '-') {
@@ -35,6 +35,10 @@ int main(int argc, char **argv)
 
 				i += 2;
 			}
+			else if(strcmp(argv[i] + 1, "period") == 0) {
+				period = opt_uint(argv[i+1]);
+				i += 2;
+			}
 			else if(strcmp(argv[i] + 1, "debug") == 0)
 				debug = true, i++;
 			else
@@ -44,32 +48,35 @@ int main(int argc, char **argv)
 			fprintf(stderr, "Invalid argument '%s'.\n", *argv), exit(1);
 	}
 
-	cpu_set(CPU_MIN);
+	cpu_set(f_min);
 	cpu_util();
 
 	while(true) {
 		float util;
+		struct pollfd fds;
 
-		usleep(1000*tm);
+		fds.fd = STDIN_FILENO;
+		fds.events = POLLIN;
+		fds.revents = 0;
+
+		if(poll(&fds, 1, period) > 0)
+			break;
+
 		util = cpu_util();
 
-		if(max) {
-			if(util < 0.5) {
-				cpu_set(f_min);
-				max = false;
+		if(max && (util < 0.5)) {
+			cpu_set(f_min);
+			max = false;
 
-				if(debug)
-					printf("%s: cpu set to %u\n", dbgtime(), f_min);
-			}
+			if(debug)
+				printf("%s: cpu set to %u\n", dbgtime(), f_min);
 		}
-		else {
-			if(util > 0.5) {
-				cpu_set(f_max);
-				max = true;
+		if(!max && (util > 0.5)) {
+			cpu_set(f_max);
+			max = true;
 
-				if(debug)
-					printf("%s: cpu set to %u\n", dbgtime(), f_max);
-			}
+			if(debug)
+				printf("%s: cpu set to %u\n", dbgtime(), f_max);
 		}
 	}
 
