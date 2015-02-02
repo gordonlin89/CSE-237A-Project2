@@ -57,6 +57,30 @@ unsigned int pwr_active(unsigned int freq)
 	error("Invalid frequency.");
 }
 
+unsigned int gpu_idle(unsigned int freq)
+{
+	switch(freq) {
+	case 177778: return 201;
+	case 200000: return 250;
+	case 228571: return 280;
+	case 266667: return 333;
+	}
+
+	error("Invalid GPU frequency.");
+}
+
+unsigned int gpu_active(unsigned int freq)
+{
+	switch(freq) {
+	case 177778: return 614;
+	case 200000: return 620;
+	case 228571: return 653;
+	case 266667: return 747;
+	}
+
+	error("Invalid GPU frequency.");
+}
+
 
 int main(int argc, char **argv)
 {
@@ -95,7 +119,7 @@ int main(int argc, char **argv)
 
 	while(true) {
 		float cur;
-		unsigned int freq;
+		unsigned int freq, g_freq;
 
 		if(pid > 0) {
 			if(waitpid(pid, NULL, WNOHANG) > 0)
@@ -110,12 +134,17 @@ int main(int argc, char **argv)
 			break;
 
 		n++;
+
 		freq = cpu_get();
+		g_freq = cpu_get();
+
 		cur = pwr_idle(freq) * step + pwr_active(freq) * cpu_util() * step;
+		cur += gpu_idle(g_freq) * step + gpu_active(g_freq) * gpu_util() * step;
+
 		energy += cur;
 
 		if(debug)
-			printf("%s: %u %f\n", dbgtime(), freq, cur);
+			printf("%s: %u %u %f\n", dbgtime(), freq, g_freq, cur);
 	}
 
 	printf("total: %f\n", energy);
