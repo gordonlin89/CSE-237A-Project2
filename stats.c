@@ -60,25 +60,27 @@ unsigned int pwr_active(unsigned int freq)
 unsigned int gpu_idle(unsigned int freq)
 {
 	switch(freq) {
-	case 177778: return 201;
-	case 200000: return 250;
-	case 228571: return 280;
-	case 266667: return 333;
+	case 177778000: return 201;
+	case 200000000: return 250;
+	case 228571000: return 280;
+	case 266667000: return 333;
 	}
 
-	error("Invalid GPU frequency.");
+	fprintf(stderr, "Invalid GPU frequency (%u).", freq);
+	abort();
 }
 
 unsigned int gpu_active(unsigned int freq)
 {
 	switch(freq) {
-	case 177778: return 614;
-	case 200000: return 620;
-	case 228571: return 653;
-	case 266667: return 747;
+	case 177778000: return 614;
+	case 200000000: return 620;
+	case 228571000: return 653;
+	case 266667000: return 747;
 	}
 
-	error("Invalid GPU frequency.");
+	fprintf(stderr, "Invalid GPU frequency (%u).", freq);
+	abort();
 }
 
 
@@ -138,7 +140,7 @@ int main(int argc, char **argv)
 		n++;
 
 		freq = cpu_get();
-		g_freq = cpu_get();
+		g_freq = gpu_get();
 
 		cur = pwr_idle(freq) * step + pwr_active(freq) * cpu_util() * step;
 
