@@ -42,7 +42,7 @@ unsigned int cpu_freqs[] = {
  */
 
 unsigned int gpu_freqs[] = {
-	177778, 200000, 228571, 266667
+	177778000, 200000000, 228571000, 266667000
 };
 
 #define GPU_NFREQS (sizeof(gpu_freqs) / sizeof(unsigned int))
