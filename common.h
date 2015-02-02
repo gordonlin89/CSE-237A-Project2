@@ -17,6 +17,7 @@
 #define CPU_UTIL "/proc/stat"
 
 #define GPU_FREQ "/sys/class/kgsl/kgsl-3d0/gpuclk"
+#define GPU_PUT "/sys/class/kgsl/kgsl-3d0/gpuclk"
 #define GPU_UTIL "/sys/class/kgsl/kgsl-3d0/gpubusy"
 
 /*
@@ -184,6 +185,16 @@ float cpu_util()
 	return util;
 }
 
+
+void gpu_init()
+{
+	FILE *fp;
+
+	fp = fopen("/sys/class/kgsl/kgsl-3d0/pwrscale/policy", "w");
+	fprintf(fp, "none");
+	fclose(fp);
+}
+
 /**
  * Retrieve the GPU frequency.
  *   &returns: The frequncy.
@@ -209,7 +220,7 @@ void gpu_set(unsigned int freq)
 {
 	FILE *fp;
 
-	fp = fopen(GPU_FREQ, "w");
+	fp = fopen(GPU_PUT, "w");
 	fprintf(fp, "%u", freq);
 	fclose(fp);
 }

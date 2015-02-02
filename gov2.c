@@ -54,6 +54,7 @@ int main(int argc, char **argv)
 	cpu_set(CPU_MIN);
 	cpu_util();
 
+	gpu_init();
 	gpu_set(GPU_MIN);
 	gpu_util();
 
