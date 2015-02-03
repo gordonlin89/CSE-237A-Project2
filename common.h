@@ -225,11 +225,11 @@ void gpu_set(unsigned int freq)
 {
 	FILE *fp;
 
-	fp = fopen(GPU_PUT, "w");
+	fp = fopen(GPU_PUT2, "w");
 	fprintf(fp, "%u", freq);
 	fclose(fp);
 
-	fp = fopen(GPU_PUT2, "w");
+	fp = fopen(GPU_PUT, "w");
 	fprintf(fp, "%u", freq);
 	fclose(fp);
 }
