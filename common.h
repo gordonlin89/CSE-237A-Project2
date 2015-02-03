@@ -116,6 +116,10 @@ void cpu_init()
 	fprintf(fp, "userspace");
 	fclose(fp);
 
+	fp = fopen("/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq", "w");
+	fprintf(fp, "%d", CPU_MIN);
+	fclose(fp);
+
 	fp = fopen("/sys/devices/system/cpu/cpu1/online", "w");
 	fprintf(fp, "0");
 	fclose(fp);
