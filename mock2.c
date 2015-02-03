@@ -28,15 +28,17 @@ float mock_util(int mock_sel)
 		break;
 
 	case 2:
-		if((cnt >= 55 && cnt <= 56) || (cnt >= 92 && cnt <= 96) || (cnt >= 121 && cnt <= 121))
+		if((cnt >= 45 && cnt <= 46) || (cnt >= 82 && cnt <= 86) || (cnt >= 111 && cnt <= 111))
 			val = 0.04;
 		else
-			val = (cnt >= 30 && cnt < 130) ? 1.0f : 0.0f;
+			val = (cnt >= 20 && cnt < 120) ? 1.0f : 0.0f;
 		break;
 
 	case 3:
-		if(cnt >= 20 && cnt < 120)
-			val = 1.0f / 100.0f * (cnt - 20) * fullscale;
+		if(cnt >= 10 && cnt < 70)
+			val = 1.0f / 60.0f * (cnt - 10) * fullscale;
+		else if(cnt >= 70 && cnt < 130)
+			val = (1.0f - 1.0f / 60.0f * (cnt - 70)) * fullscale;
 		else
 			val = 0.0f;
 
@@ -70,7 +72,7 @@ int main(int argc, char **argv)
 	unsigned int i = 1;
 	float smooth = 0.6f;
 	unsigned int inc = 4, dec = 1;
-	float thres_low = 0.3, thres_high = 0.7;
+	float thres_low = 0.45, thres_high = 0.7;
 	bool c_enable = true;
 	int mock_sel = 1;
 
