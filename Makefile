@@ -28,5 +28,4 @@ run: all
 	adb push gov2.out /data/local
 	adb push stats.out /data/local
 	adb push periodic.out /data/local
-	adb push run_periodic.sh /data/local
 
