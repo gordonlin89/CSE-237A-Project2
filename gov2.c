@@ -14,10 +14,10 @@ int main(int argc, char **argv)
 	int c_sel = 0, g_sel = 0;
 	int debug = 0;
 	unsigned int i = 1;
-	float smooth = 0.6f;
+	float smooth = 0.1f;
 	unsigned int inc = 4, dec = 1;
 	float thres_low = 0.45f, thres_high = 0.7f;
-	float gpu_low = 0.2, gpu_high = 0.6;
+	float gpu_low = 0.1, gpu_high = 0.2;
 	bool c_enable = true, g_enable = true;
 
 	while(argv[i] != NULL) {
