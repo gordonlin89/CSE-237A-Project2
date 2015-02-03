@@ -16,7 +16,7 @@ int main(int argc, char **argv)
 	unsigned int i = 1;
 	float smooth = 0.6f;
 	unsigned int inc = 4, dec = 1;
-	float thres_low = 0.3f, thres_high = 0.7f;
+	float thres_low = 0.45f, thres_high = 0.7f;
 	float gpu_low = 0.2, gpu_high = 0.6;
 	bool c_enable = true, g_enable = true;
 
