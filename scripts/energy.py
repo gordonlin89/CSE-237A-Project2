@@ -19,5 +19,6 @@ cpu_power = cpu_energy / total_time
 gpu_power = gpu_energy / total_time
 
 print(cpu_power, cpu_energy, total_time, cpu_edp, sep=',')
-print(gpu_power, total_time, gpu_edp, sep=',')
+print(gpu_power, gpu_energy, total_time, gpu_edp, sep=',')
+print(cpu_power + gpu_power, cpu_energy + gpu_energy, total_time, cpu_edp + gpu_edp, sep=',')
 
