@@ -1,0 +1,20 @@
+#!/bin/bash
+# usage: for some event tagged as 'N',
+#	./event_select N
+
+valid=('1' '2' '3' '4' '5')
+
+if [[ $1 = '' ]]; then 
+	echo "please select a valid event: MSM8960:(1,2,3,4) or MSM8660:(1,2,3,4,5)" 
+	exit
+fi
+
+for s in "${valid[@]}"; do
+	if [[ "$s" = "$1" ]]; then
+		echo event_$1
+
+	adb push event_$1 /sdcard/events
+	adb shell ./data/local/event_replay
+
+	fi
+done
